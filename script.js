@@ -79,7 +79,9 @@ const LearnerSubmissions = [
 ];
 
 /**
- * WHAT THE FUNCTION IS LOOKING FOR:
+ * WHAT THE FUNCTION NEEDS TO RETURN:
+ * 
+ * An array of objects that contain the following requirements per key:
  * 
  * 1) The ID of the learner for which this data has been collected 
  *              >> "id": number
@@ -111,32 +113,32 @@ function getLearnerData(course, ag, submissions) {
     // initialize result based result to be returned on no dupe id array.length
     const result = [];
     for (i=0;i<studentIDNoDupes.length;i++) {
-        result[i] = { ID: studentIDNoDupes[i] };
+        result[i] = { id: studentIDNoDupes[i] };
     }
 
+    // determine weighted average of each unique student
     for(i=0;i<studentIDNoDupes.length;i++) { // checks through each unique student id
         let numerator = 0;
         let denominator = 0;
         for(k=0;k<submissions.length;k++) { // checks through each submission
-            if (studentIDNoDupes[i] === submissions[k].learner_id) { // if unique student id matches submission student id
+            if (studentIDNoDupes[i] === submissions[k].learner_id) { // if unique student id matches submission student id AND if due date has not passed
+                // target object in result, then add key with string literal and assign it to score/possible_points
+                result[i][`${submissions[k].assignment_id}`] = (submissions[k].submission.score)/(ag.assignments[(submissions[k].assignment_id)-1].points_possible);
+
+                // log numerator and denominator
                 numerator += submissions[k].submission.score;
                 denominator += ag.assignments[(submissions[k].assignment_id)-1].points_possible;
-                // studentIDNoDupes[i]
             }
-            result[i].avg = numerator/denominator;   
         }
+        result[i].avg = numerator/denominator;
         // log the numerator and denominator to appropriate obj
     }
-
     return result;
 }
 
 const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
 
 console.log(result);
-
-
-
 
 // ===================Example of What Output Should be===================
 
