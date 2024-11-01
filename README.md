@@ -16,3 +16,14 @@ Starting from the third key, all keys will be numbers representing the ID's of s
 Each assignment number key is paired with the specific points earned / possible points to earn, rather than being the sum of all numerators and
 denominators. With this key's introduction in mind, it's important to note than not all objects in this array will contain the same number of
 keys, since some students may not have submitted for particular assignments.
+
+# Additional Features:
+* If an assignment is not yet due, it is not be included in either the average or the keyed dictionary of scores.
+
+* If an AssignmentGroup does not belong to its course (mismatching course_id), your program should throw an error, letting 
+the user know that the input was invalid. Similar data validation occurs elsewhere within the program.
+
+* The program checks for if points_possible is 0 and whether the type is appropriately a number.
+
+* If an assignment is not yet due, it is not included in the results or the average. Additionally, if the learner’s submission 
+is late, 10 percent of the total points possible are deducted from their score for that assignment.

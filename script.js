@@ -75,6 +75,14 @@ const LearnerSubmissions = [
             submitted_at: "2023-03-07",
             score: 140
         }
+    },
+    {
+        learner_id: '149',
+        assignment_id: 2,
+        submission: {
+            submitted_at: "2023-03-07",
+            score: 140
+        }
     }
 ];
 
@@ -124,66 +132,80 @@ const LearnerSubmissions = [
 
 function getLearnerData(course, ag, submissions) {
     try {
-        if (ag.course_id === course.id) {
+        if ((ag.course_id === course.id) && (typeof ag.course_id === "number") && (typeof course.id === "number")) {
+            // boolean to determine if a student was excluded from list
+            let missing = false;
             // for loop to calculate all unique learners (student id's)
             const storeStudentID = []; // fill array with all student ids including duplicates
-            for (i=0;i<submissions.length;i++) {
+            for (i = 0; i < submissions.length; i++) {
+                if (typeof submissions[i].learner_id !== "number") {
+                    missing = true;
+                    continue;
+                }
                 storeStudentID.push(submissions[i].learner_id);
             }
+
+            try {
+                if (missing === true) throw "Error! One or more learner ID's are an invalid type. One or more learners have been excluded from the data."
+            }
+            catch (err) {
+                console.log(err)
+            }
+
             const studentIDNoDupes = [...new Set(storeStudentID)]; // removes duplicates from original student id array
 
             // initialize result based result to be returned on no dupe id array.length
             const result = [];
-            for (i=0;i<studentIDNoDupes.length;i++) {
+            for (i = 0; i < studentIDNoDupes.length; i++) {
                 result[i] = { id: studentIDNoDupes[i] };
             }
 
             // determine weighted average of each unique student
             let currentDate = new Date(); // MUST be let, cannot be const
             currentDate = new Date(Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), currentDate.getUTCDate())); // today's date in UTC
-            for(i=0;i<studentIDNoDupes.length;i++) { // checks through each unique student id
+            for (i = 0; i < studentIDNoDupes.length; i++) { // checks through each unique student id
                 let numerator = 0;
                 let denominator = 0;
                 let k = 0;
-                while(k<submissions.length) { // checks through each submission
+                while (k < submissions.length) { // checks through each submission
                     let onTime = true; // value to check if assignment is late
-                    const dueDate = new Date(ag.assignments[(submissions[k].assignment_id)-1].due_at + "T00:00:00Z"); // gets assignment due date + the extra string enforces UTC
+                    const dueDate = new Date(ag.assignments[(submissions[k].assignment_id) - 1].due_at + "T00:00:00Z"); // gets assignment due date + the extra string enforces UTC
                     // if unique student id matches submission student id AND if due date has not passed 
                     // AND (checks to make sure points possible is greater than 0 AND typeof points_possible is a number)
-                    if ( (studentIDNoDupes[i] === submissions[k].learner_id) && (currentDate>dueDate) && 
-                    ((ag.assignments[(submissions[k].assignment_id)-1].points_possible > 0) && (typeof ag.assignments[(submissions[k].assignment_id)-1].points_possible === "number"))) {
+                    if ((studentIDNoDupes[i] === submissions[k].learner_id) && (currentDate > dueDate) &&
+                        ((ag.assignments[(submissions[k].assignment_id) - 1].points_possible > 0) && (typeof ag.assignments[(submissions[k].assignment_id) - 1].points_possible === "number"))) {
                         // target object in result, then add key with string literal and assign it to score/possible_points
-                        result[i][`${submissions[k].assignment_id}`] = (submissions[k].submission.score)/(ag.assignments[(submissions[k].assignment_id)-1].points_possible);
+                        result[i][`${submissions[k].assignment_id}`] = (submissions[k].submission.score) / (ag.assignments[(submissions[k].assignment_id) - 1].points_possible);
 
                         // if late, deduct 10 percent from numerator
                         let subDate = new Date(submissions[k].submission.submitted_at + "T00:00:00Z");
-                        if ( subDate > dueDate) {
+                        if (subDate > dueDate) {
                             onTime = false;
                         }
 
                         // log numerator and denominator - considers late assignments
                         if (onTime === true) {
                             numerator += submissions[k].submission.score;
-                            denominator += ag.assignments[(submissions[k].assignment_id)-1].points_possible;
+                            denominator += ag.assignments[(submissions[k].assignment_id) - 1].points_possible;
                         }
                         else {
                             numerator += submissions[k].submission.score;
-                            numerator = numerator - ((ag.assignments[(submissions[k].assignment_id)-1].points_possible)*0.1);
+                            numerator = numerator - ((ag.assignments[(submissions[k].assignment_id) - 1].points_possible) * 0.1);
                             if (numerator < 0) { // in case for very low scores
                                 numerator = 0;
                             }
-                            denominator += ag.assignments[(submissions[k].assignment_id)-1].points_possible;
+                            denominator += ag.assignments[(submissions[k].assignment_id) - 1].points_possible;
                         }
                     }
                     k++;
                 }
-                result[i].avg = numerator/denominator;
+                result[i].avg = numerator / denominator;
                 // log the numerator and denominator to appropriate obj
             }
             return result;
         }
         else {
-            throw "Error! Assignment Group and Course ID Mismatch."
+            throw "Error! Assignment Group and Course ID mismatch. Possible type mismatch."
         }
     }
     catch (err) {
@@ -202,11 +224,11 @@ console.log(result);
  * 2) Use operators to perform calculations on variables and literals. ✓
  * 3) Use strings, numbers, and Boolean values cached within variables. ✓
  * 4) Use at least two if/else statements to control program flow. Optionally, use at least one switch statement. ✓
- * 5) Use try/catch statements to manage potential errors in the code, such as incorrectly formatted or typed data being fed into your program. - add more meaningful try/catch blocks
+ * 5) Use try/catch statements to manage potential errors in the code, such as incorrectly formatted or typed data being fed into your program. ✓
  * 6) Utilize at least two different types of loops. ✓
- * 7) Utilize at least one loop control keyword such as break or continue. - need one break or continue
+ * 7) Utilize at least one loop control keyword such as break or continue. ✓
  * 8) Create and/or manipulate arrays and objects. ✓
- * 9) Demonstrate the retrieval, manipulation, and removal of items in an array or properties in an object. - yes retrieval, should add more manip and removal
+ * 9) Demonstrate the retrieval, manipulation, and removal of items in an array or properties in an object. - removal
  * 10) Use functions to handle repeated tasks. - implement helper functions
  * 11) Program outputs processed data as described above. Partial credit will be earned depending on the level of adherence to the described behavior. ✓
  * 12) Ensure that the program runs without errors (comment out things that do not work, and explain your blockers - you can still receive partial credit). ✓
