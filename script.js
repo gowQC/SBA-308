@@ -138,13 +138,19 @@ function getLearnerData(course, ag, submissions) {
             // for loop to calculate all unique learners (student id's)
             const storeStudentID = []; // fill array with all student ids including duplicates
             for (i = 0; i < submissions.length; i++) {
-                if (typeof submissions[i].learner_id !== "number") {
+                if (typeof submissions[i].learner_id === "string") { // if string, convert to number
+                    let temp = submissions[i].learner_id;
+                    delete submissions[i].learner_id;
+                    submissions[i].learner_id = parseInt(temp);
+                }
+                else if (typeof submissions[i].learner_id !== "number") { // if not number, log it with boolean and continue
                     missing = true;
                     continue;
                 }
                 storeStudentID.push(submissions[i].learner_id);
             }
 
+            // if boolean is true, display soft error
             try {
                 if (missing === true) throw "Error! One or more learner ID's are an invalid type. One or more learners have been excluded from the data."
             }
@@ -160,6 +166,17 @@ function getLearnerData(course, ag, submissions) {
                 result[i] = { id: studentIDNoDupes[i] };
             }
 
+            // date comparison function for criteria
+            function dateCompare(dueDate, submittedString) {
+                const subDate = new Date(submittedString + "T00:00:00Z");
+                if (subDate > dueDate) {
+                    return false; // returns false if submitted date is after due date
+                }
+                else {
+                    return true;
+                }
+            }
+
             // determine weighted average of each unique student
             let currentDate = new Date(); // MUST be let, cannot be const
             currentDate = new Date(Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), currentDate.getUTCDate())); // today's date in UTC
@@ -168,33 +185,29 @@ function getLearnerData(course, ag, submissions) {
                 let denominator = 0;
                 let k = 0;
                 while (k < submissions.length) { // checks through each submission
-                    let onTime = true; // value to check if assignment is late
                     const dueDate = new Date(ag.assignments[(submissions[k].assignment_id) - 1].due_at + "T00:00:00Z"); // gets assignment due date + the extra string enforces UTC
                     // if unique student id matches submission student id AND if due date has not passed 
                     // AND (checks to make sure points possible is greater than 0 AND typeof points_possible is a number)
                     if ((studentIDNoDupes[i] === submissions[k].learner_id) && (currentDate > dueDate) &&
                         ((ag.assignments[(submissions[k].assignment_id) - 1].points_possible > 0) && (typeof ag.assignments[(submissions[k].assignment_id) - 1].points_possible === "number"))) {
-                        // target object in result, then add key with string literal and assign it to score/possible_points
-                        result[i][`${submissions[k].assignment_id}`] = (submissions[k].submission.score) / (ag.assignments[(submissions[k].assignment_id) - 1].points_possible);
-
-                        // if late, deduct 10 percent from numerator
-                        let subDate = new Date(submissions[k].submission.submitted_at + "T00:00:00Z");
-                        if (subDate > dueDate) {
-                            onTime = false;
-                        }
-
+                        // boolean to determine if late or not
+                        let onTime = dateCompare(dueDate, submissions[k].submission.submitted_at);
                         // log numerator and denominator - considers late assignments
-                        if (onTime === true) {
+                        if (onTime === true) {  // not late
                             numerator += submissions[k].submission.score;
                             denominator += ag.assignments[(submissions[k].assignment_id) - 1].points_possible;
+                            // target object in result, then add key with string literal and assign it to score/possible_points
+                            result[i][`${submissions[k].assignment_id}`] = (submissions[k].submission.score) / (ag.assignments[(submissions[k].assignment_id) - 1].points_possible);
                         }
-                        else {
+                        else { // late = deduct 10 percent of total points from numerator
                             numerator += submissions[k].submission.score;
                             numerator = numerator - ((ag.assignments[(submissions[k].assignment_id) - 1].points_possible) * 0.1);
-                            if (numerator < 0) { // in case for very low scores
+                            if (numerator < 0) { // in case of very low scores
                                 numerator = 0;
                             }
                             denominator += ag.assignments[(submissions[k].assignment_id) - 1].points_possible;
+                            // target object in result, then add key with string literal and assign it to score/possible_points
+                            result[i][`${submissions[k].assignment_id}`] = ((submissions[k].submission.score) - ((ag.assignments[(submissions[k].assignment_id) - 1].points_possible) * 0.1)) / (ag.assignments[(submissions[k].assignment_id) - 1].points_possible);
                         }
                     }
                     k++;
@@ -216,22 +229,3 @@ function getLearnerData(course, ag, submissions) {
 const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
 
 console.log(result);
-
-/**
- * MY PERSONAL CHECKLIST FOR REQUIREMENTS:
- * 
- * 1) Declare variables properly using let and const where appropriate. ✓
- * 2) Use operators to perform calculations on variables and literals. ✓
- * 3) Use strings, numbers, and Boolean values cached within variables. ✓
- * 4) Use at least two if/else statements to control program flow. Optionally, use at least one switch statement. ✓
- * 5) Use try/catch statements to manage potential errors in the code, such as incorrectly formatted or typed data being fed into your program. ✓
- * 6) Utilize at least two different types of loops. ✓
- * 7) Utilize at least one loop control keyword such as break or continue. ✓
- * 8) Create and/or manipulate arrays and objects. ✓
- * 9) Demonstrate the retrieval, manipulation, and removal of items in an array or properties in an object. - removal
- * 10) Use functions to handle repeated tasks. - implement helper functions
- * 11) Program outputs processed data as described above. Partial credit will be earned depending on the level of adherence to the described behavior. ✓
- * 12) Ensure that the program runs without errors (comment out things that do not work, and explain your blockers - you can still receive partial credit). ✓
- * 13) Commit frequently to the git repository. ✓
- * 14) Include a README file that contains a description of your application. ✓
- */

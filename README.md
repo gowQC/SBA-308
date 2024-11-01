@@ -18,12 +18,28 @@ denominators. With this key's introduction in mind, it's important to note than 
 keys, since some students may not have submitted for particular assignments.
 
 # Additional Features:
-* If an assignment is not yet due, it is not be included in either the average or the keyed dictionary of scores.
+* If an assignment is not yet due, it is not included in either the average or the keyed dictionary of scores.
 
-* If an AssignmentGroup does not belong to its course (mismatching course_id), your program should throw an error, letting 
+* If an AssignmentGroup does not belong to its course (mismatching course_id), the program throws an error, letting 
 the user know that the input was invalid. Similar data validation occurs elsewhere within the program.
 
 * The program checks for if points_possible is 0 and whether the type is appropriately a number.
 
 * If an assignment is not yet due, it is not included in the results or the average. Additionally, if the learner’s submission 
-is late, 10 percent of the total points possible are deducted from their score for that assignment.
+is late, a deduction of 10 percent of the total points will occur for the score of that assignment.
+
+# My Personal Checklist for Requirements of this Assignment:
+* 1) Declare variables properly using let and const where appropriate. ✓
+* 2) Use operators to perform calculations on variables and literals. ✓
+* 3) Use strings, numbers, and Boolean values cached within variables. ✓
+* 4) Use at least two if/else statements to control program flow. Optionally, use at least one switch statement. ✓
+* 5) Use try/catch statements to manage potential errors in the code, such as incorrectly formatted or typed data being fed into your program. ✓
+* 6) Utilize at least two different types of loops. ✓
+* 7) Utilize at least one loop control keyword such as break or continue. ✓
+* 8) Create and/or manipulate arrays and objects. ✓
+* 9) Demonstrate the retrieval, manipulation, and removal of items in an array or properties in an object. ✓
+* 10) Use functions to handle repeated tasks. ✓
+* 11) Program outputs processed data as described above. Partial credit will be earned depending on the level of adherence to the described behavior. ✓
+* 12) Ensure that the program runs without errors (comment out things that do not work, and explain your blockers - you can still receive partial credit). ✓
+* 13) Commit frequently to the git repository. ✓
+* 14) Include a README file that contains a description of your application. ✓
