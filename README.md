@@ -12,7 +12,7 @@ scores of a student's assignments. It will also collect the sum of possible_poin
 result will have the 'avg' key pair with a number value that represents numerator_sum/denominator_sum.
 
 # 3rd+ Key(s): <assignment_id>
-Starting from the third key, all other keys will be numbers representing the ID's of specific assignments that the students submitted work for.
+Starting from the third key, all keys will be numbers representing the ID's of specific assignments that the students submitted work for.
 Each assignment number key is paired with the specific points earned / possible points to earn, rather than being the sum of all numerators and
 denominators. With this key's introduction in mind, it's important to note than not all objects in this array will contain the same number of
 keys, since some students may not have submitted for particular assignments.
